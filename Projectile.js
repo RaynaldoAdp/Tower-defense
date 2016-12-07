@@ -3,6 +3,8 @@ var Projectile = function(tower){
 	this.y = tower.y;
 	this.r = 4;
 	this.toDelete = false;
+	this.directionX = 0;
+	this.directionY = 0;
 
 	this.show = function(){
 		fill(255);	
@@ -10,10 +12,10 @@ var Projectile = function(tower){
 	}
 
 	this.move = function(enemy){
-		var directionX = this.x - enemy.x;
-		var directionY = this.y - enemy.y;
-		this.x -= directionX/10;
-		this.y -= directionY/10;
+		this.directionX = this.x - enemy.x;
+		this.directionY = this.y - enemy.y;
+		this.x -= this.directionX/10;
+		this.y -= this.directionY/10;
 	}
 
 	this.hit = function(enemy){
