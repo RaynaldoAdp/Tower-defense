@@ -35,7 +35,7 @@ var projectiles = [];
 var mode = 255;
 var towerMode = false;
 
-function lalala(){
+function detectButtons(){
 	$('#1').click(function(){
 		event.preventDefault();
 		mode = 255;
@@ -70,7 +70,7 @@ function lalala(){
 }
 
 $(document).ready(function(){
-	lalala();
+	detectButtons();
 });
 
 function setup() {
