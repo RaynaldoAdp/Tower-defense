@@ -3,8 +3,8 @@ var Projectile = function(tower){
 	this.y = tower.y;
 	this.r = 4;
 	this.toDelete = false;
-	this.directionX = 0;
-	this.directionY = 0;
+	this.velocityX = 0;
+	this.velocityY = 0;
 
 	this.show = function(){
 		fill(255);	
@@ -12,13 +12,13 @@ var Projectile = function(tower){
 	}
 
 	this.setVelocity = function(enemy){
-		this.directionX = (this.x - enemy.x) / 50;
-		this.directionY = (this.y - enemy.y) / 50;
+		this.velocityX = (this.x - enemy.x) / 5;
+		this.velocityY = (this.y - enemy.y) / 5;
 	}
 
 	this.update = function(){
-		this.x -= this.directionX;
-		this.y -= this.directionY;
+		this.x -= this.velocityX;
+		this.y -= this.velocityY;
 	}
 
 	this.hit = function(enemy){

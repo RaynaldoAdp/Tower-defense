@@ -51,11 +51,11 @@ function detectButtons(){
 		var y = 0;
 		currentFrameCount = frameCount;
 		path = findShortestPath([0,0]);
-/*		for(i = 0; i < 10; i++){*/
+		for(i = 0; i < 10; i++){
 			var newEnemy = new Enemy(y);
 			enemy.push(newEnemy);
 			y += 20;
-/*		}*/
+		}
 	});
 	$('#tower').click(function(){
 		if(!towerMode){
@@ -91,9 +91,7 @@ function draw() {
 				}
 			}
 		}
-		for(k = 0; k < projectiles.length; k++){ // multiple ks detect one i; THATS THE FUCKING PROBLEM ASDFADSFADF
-			projectiles[k].show();
-			projectiles[k].update(); // the more the enemies it gets updated more times; If enemy = 1, updates once. if enemy = 2, updates twice and so on!
+		for(k = 0; k < projectiles.length; k++){
 			if (projectiles[k].hit(enemy[i])){
 				projectiles[k].disappear();
 				enemy[i].minusHp();
@@ -102,6 +100,7 @@ function draw() {
 	}
 
 	for(i = 0; i < projectiles.length; i++){
+		projectiles[i].show();
 		projectiles[i].update();
 	}
 
@@ -157,7 +156,7 @@ function mouseClicked(){
 	gameArray[14- positionY][positionX] = mode;
 
 	//create Towers
-	if(towerMode){
+	if(towerMode && mouseX > 0 && mouseY > 0){
 		tower = new Tower(pixelPositionX+20, pixelPositionY+20);
 		towers.push(tower);
 	}

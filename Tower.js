@@ -1,4 +1,4 @@
-var Tower = function(x, y){
+var Tower = function(x, y){ //WHEN TOWER BUTTON IS CLICKED A TOWER IS CREATED THERE!
 	this.x = x;
 	this.y = y;
 
