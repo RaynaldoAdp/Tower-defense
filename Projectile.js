@@ -11,11 +11,14 @@ var Projectile = function(tower){
 		ellipse(this.x, this.y , this.r * 2, this.r * 2);
 	}
 
-	this.move = function(enemy){
+	this.setDirection = function(enemy){
 		this.directionX = this.x - enemy.x;
 		this.directionY = this.y - enemy.y;
-		this.x -= this.directionX/10;
-		this.y -= this.directionY/10;
+	}
+
+	this.update = function(){
+		this.x -= this.directionX/50;
+		this.y -= this.directionY/50;
 	}
 
 	this.hit = function(enemy){

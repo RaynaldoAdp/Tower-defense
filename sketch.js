@@ -34,6 +34,7 @@ var towers = [];
 var projectiles = [];
 var mode = 255;
 var towerMode = false;
+var currentFrameCount;
 
 function detectButtons(){
 	$('#1').click(function(){
@@ -48,16 +49,13 @@ function detectButtons(){
 	});
 	$('#begin').click(function(){
 		var y = 0;
-/*		for(i = 0; i < 10; i++){*/
-			var newPath = findShortestPath([0,0])
-			path = newPath;
+		currentFrameCount = frameCount;
+		path = findShortestPath([0,0]);
+		for(i = 0; i < 10; i++){
 			var newEnemy = new Enemy(y);
 			enemy.push(newEnemy);
 			y += 20;
-			for(i = 0; i < enemy.length; i++){
-				traversingArrayInDelay(path, enemy[i]);
-			}
-/*		}*/
+		}
 	});
 	$('#tower').click(function(){
 		if(!towerMode){
@@ -75,24 +73,26 @@ $(document).ready(function(){
 
 function setup() {
   createCanvas(600, 600);
-  frameRate(60); 
+  frameRate(20); 
 }
 
 function draw() {
 	background(0);
 	for(i = 0; i < enemy.length; i++){
 		enemy[i].show();
+		enemy[i].update(path, frameCount, currentFrameCount);
 		for(j = 0; j < towers.length; j++){
-			if(frameCount % 60 === 0){
+			if(frameCount % 20 === 0){
 				if(towers[j].detect(enemy[i])){
-					projectile = new Projectile(towers[j]);
+					projectile = new Projectile(towers[j]);		
+					projectile.setDirection(enemy[i]);
 					projectiles.push(projectile);
 				}
 			}
 		}
-		for(k = 0; k < projectiles.length; k++){
+		for(k = 0; k < projectiles.length; k++){ // multiple ks detect one i; THATS THE FUCKING PROBLEM ASDFADSFADF
 			projectiles[k].show();
-			projectiles[k].move(enemy[i]);
+			projectiles[k].update();
 			if (projectiles[k].hit(enemy[i])){
 				projectiles[k].disappear();
 				enemy[i].minusHp();
@@ -297,9 +297,10 @@ var exploreInDirection = function(currentLocation, direction) {
 };
 
 
-function traversingArrayInDelay(path, enemy){
+/*function traversingArrayInDelay(path, enemy){
  (function theLoop (i) {
    setTimeout(function () {
+   		console.log(path[i]);
 		if(path[Math.abs(i - path.length)] === "North"){
 		enemy.velocityX = 0;
 		enemy.velocityY = 2/3;
@@ -321,7 +322,7 @@ function traversingArrayInDelay(path, enemy){
     	}
    }, 1000);
  })(path.length);
-}
+}*/
 
 function enemyMovementLogic(path, enemy){
 
