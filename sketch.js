@@ -35,6 +35,8 @@ var projectiles = [];
 var mode = 255;
 var towerMode = false;
 var currentFrameCount;
+var frameCountFromZero;
+var enemySpawnIndex = 0; // decides how many enemies will be spawned
 
 function detectButtons(){
 	$('#1').click(function(){
@@ -51,11 +53,11 @@ function detectButtons(){
 		var y = 0;
 		currentFrameCount = frameCount;
 		path = findShortestPath([0,0]);
-		for(i = 0; i < 10; i++){
+/*		for(i = 0; i < 10; i++){
 			var newEnemy = new Enemy(y);
 			enemy.push(newEnemy);
 			y += 20;
-		}
+		}*/
 	});
 	$('#tower').click(function(){
 		if(!towerMode){
@@ -78,9 +80,19 @@ function setup() {
 
 function draw() {
 	background(0);
+	frameCountFromZero = frameCount - currentFrameCount + 18;
+	if(frameCountFromZero % 20 === 0){
+		enemySpawnIndex++;
+		for(i = 0; i < enemySpawnIndex; i++){
+			if(enemySpawnIndex < 11){
+				var newEnemy = new Enemy();
+				enemy.push(newEnemy);
+			}
+		}
+	}
+
 	for(i = 0; i < enemy.length; i++){
 		enemy[i].show();
-
 		enemy[i].update(path, frameCount, currentFrameCount);
 		for(j = 0; j < towers.length; j++){
 			if(frameCount % 20 === 0){

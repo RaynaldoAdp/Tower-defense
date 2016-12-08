@@ -1,5 +1,5 @@
-var Enemy = function(y){
-	this.y = 620 + y;
+var Enemy = function(){
+	this.y = 620;
 	this.x = 20;
 	this.r = 10;
 	this.hp = 3;
