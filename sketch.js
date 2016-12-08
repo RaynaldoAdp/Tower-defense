@@ -51,11 +51,11 @@ function detectButtons(){
 		var y = 0;
 		currentFrameCount = frameCount;
 		path = findShortestPath([0,0]);
-		for(i = 0; i < 10; i++){
+/*		for(i = 0; i < 10; i++){*/
 			var newEnemy = new Enemy(y);
 			enemy.push(newEnemy);
 			y += 20;
-		}
+/*		}*/
 	});
 	$('#tower').click(function(){
 		if(!towerMode){
@@ -73,31 +73,36 @@ $(document).ready(function(){
 
 function setup() {
   createCanvas(600, 600);
-  frameRate(20); 
+  frameRate(20);
 }
 
 function draw() {
 	background(0);
 	for(i = 0; i < enemy.length; i++){
 		enemy[i].show();
+
 		enemy[i].update(path, frameCount, currentFrameCount);
 		for(j = 0; j < towers.length; j++){
 			if(frameCount % 20 === 0){
 				if(towers[j].detect(enemy[i])){
-					projectile = new Projectile(towers[j]);		
-					projectile.setDirection(enemy[i]);
+					projectile = new Projectile(towers[j]);
+					projectile.setVelocity(enemy[i]);
 					projectiles.push(projectile);
 				}
 			}
 		}
 		for(k = 0; k < projectiles.length; k++){ // multiple ks detect one i; THATS THE FUCKING PROBLEM ASDFADSFADF
 			projectiles[k].show();
-			projectiles[k].update();
+			projectiles[k].update(); // the more the enemies it gets updated more times; If enemy = 1, updates once. if enemy = 2, updates twice and so on!
 			if (projectiles[k].hit(enemy[i])){
 				projectiles[k].disappear();
 				enemy[i].minusHp();
 			}
 		}
+	}
+
+	for(i = 0; i < projectiles.length; i++){
+		projectiles[i].update();
 	}
 
 	for(i = projectiles.length -1; i >= 0; i--){
@@ -110,7 +115,7 @@ function draw() {
 		if(enemy[i].toDelete){
 			enemy.splice(i,1);
 		}
-	}	
+	}
 
 	for(i = 0; i < tiles.length; i++){
 		tiles[i].show();
