@@ -1,22 +1,4 @@
-/*var gameArray = [
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,'Goal'],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],						
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	['Start',0,0,0,0,0,0,0,0,0,0,0,0,0,0],							
-];*/
-
-//gameArray 15 x 15 along with starting and endpoint for the game
+//gameArray 15 x 15 representing the state of the game
 var gameArray = [];
 for(i = 0; i < 15; i++){
 	gameArray[i] = [];
@@ -24,20 +6,35 @@ for(i = 0; i < 15; i++){
 		gameArray[i][j] = "Empty";
 	}
 }
+//starting and end point of the game
 gameArray[0][0] = "Start";
 gameArray[14][14] = "Goal";
 
+//controls the path of the enemies
 var path = [];
+//array for the enemies spawned
 var enemy = [];
+//array for the tiles spawned
 var tiles = [];
+//array for the towers spawned
 var towers = [];
+//array for projectiles spawned
 var projectiles = [];
+//controls the color and mode of the tiles
 var mode = 255;
+//controls whether tower mode is on or off
 var towerMode = false;
+//the framecount when the game starts
 var currentFrameCount;
+//the framecount after the game starts
 var frameCountFromZero;
-var enemySpawnIndex = 0; // decides how many enemies will be spawned
+// controls how many enemies will be spawned
+var enemySpawnIndex = 0; 
+//queue for projectiles in order to make only 1 projectile exist at a time for one tower.
+var queueForProjectiles = [];
 
+
+//function to detect buttons that are not in canvas
 function detectButtons(){
 	$('#1').click(function(){
 		event.preventDefault();
@@ -53,11 +50,6 @@ function detectButtons(){
 		var y = 0;
 		currentFrameCount = frameCount;
 		path = findShortestPath([0,0]);
-/*		for(i = 0; i < 10; i++){
-			var newEnemy = new Enemy(y);
-			enemy.push(newEnemy);
-			y += 20;
-		}*/
 	});
 	$('#tower').click(function(){
 		if(!towerMode){
@@ -73,6 +65,8 @@ $(document).ready(function(){
 	detectButtons();
 });
 
+
+//main logic of the canvas and the renderings
 function setup() {
   createCanvas(600, 600);
   frameRate(20);
@@ -80,6 +74,8 @@ function setup() {
 
 function draw() {
 	background(0);
+
+	//controls enemy spawn rate and number of enemies spawned
 	frameCountFromZero = frameCount - currentFrameCount + 18;
 	if(frameCountFromZero % 20 === 0){
 		enemySpawnIndex++;
@@ -91,12 +87,15 @@ function draw() {
 		}
 	}
 
+	//controls the tower detecting and shooting mechanism
 	for(i = 0; i < enemy.length; i++){
 		enemy[i].show();
 		enemy[i].update(path, frameCount, currentFrameCount);
 		for(j = 0; j < towers.length; j++){
 			if(frameCount % 20 === 0){
-				if(towers[j].detect(enemy[i])){
+				if(towers[j].detect(enemy[i]) && towers[j].queueForProjectiles.length === 0){
+					console.log(1234);
+					towers[j].addQueue();
 					projectile = new Projectile(towers[j]);
 					projectile.setVelocity(enemy[i]);
 					projectiles.push(projectile);
@@ -111,50 +110,47 @@ function draw() {
 		}
 	}
 
+	//controls that each tower only shoots one enemy instead of all enemies
+	for(i = 0; i < towers.length; i++){
+		for(j = 0; j < projectiles.length; j++){
+			for(k = 0; k < enemy.length; k++){
+				if(projectiles[j].hit(enemy[k])){
+					towers[i].removeQueue();
+				}
+			}
+		}
+	}
+
+	//controls the movements of the projectiles of the towers
 	for(i = 0; i < projectiles.length; i++){
 		projectiles[i].show();
 		projectiles[i].update();
 	}
 
+	//projectiles to disappear when hit enemies
 	for(i = projectiles.length -1; i >= 0; i--){
 		if(projectiles[i].toDelete){
 			projectiles.splice(i,1);
 		}
 	}
 
+	//enemies to disappear when its hp finish
 	for(i = enemy.length -1; i >= 0; i--){
 		if(enemy[i].toDelete){
 			enemy.splice(i,1);
 		}
 	}
 
+	//controls the mechanism to show the tiles
 	for(i = 0; i < tiles.length; i++){
 		tiles[i].show();
 	}
 
+	//constrols the mechanism to show the towers
 	for(i = 0; i < towers.length; i++){
 		towers[i].show();
 	}
 
-/*	for(i = 0; i < enemy.length; i++){
-		for(j = 0; j < tiles.length; j++){
-			var indexX = tiles[j].x/40;
-			var indexY = tiles[j].y/40;
-			if(enemy[i].detectTop(tiles[j])){
-				movementLogicForTop(enemy[i], tiles[j], indexX, indexY);
-			}
-			else if(enemy[i].detectBottom(tiles[j])){
-				movementLogicForBottom(enemy[i], tiles[j], indexX, indexY);
-			}
-			else if(enemy[i].detectRight(tiles[j])){
-				movementLogicForRight(enemy[i], tiles[j], indexX, indexY);
-			}
-			else if(enemy[i].detectLeft(tiles[j])){
-				movementLogicForLeft(enemy[i], tiles[j], indexX, indexY);
-			}						
-		}
-	}
-*/
 }
 
 function mouseClicked(){
@@ -185,6 +181,7 @@ function division2(position){
 	var positionResult = Math.floor(positionBot);
 	return positionResult;
 }
+
 
 // This section is for enemy movement logic using the BFS algorithm. Credit goes to Greg Trowbridge.
 
@@ -246,7 +243,6 @@ var findShortestPath = function(startCoordinates) {
 
   // No valid path found
   return false;
-
 
 };
 
@@ -311,62 +307,3 @@ var exploreInDirection = function(currentLocation, direction) {
 
   return newLocation;
 };
-
-
-/*function traversingArrayInDelay(path, enemy){
- (function theLoop (i) {
-   setTimeout(function () {
-   		console.log(path[i]);
-		if(path[Math.abs(i - path.length)] === "North"){
-		enemy.velocityX = 0;
-		enemy.velocityY = 2/3;
-		}
-		else if(path[Math.abs(i - path.length)] === "East"){
-			enemy.velocityX = 2/3;
-			enemy.velocityY = 0;
-		}
-		else if(path[Math.abs(i - path.length)] === "South"){
-			enemy.velocityX = 0;
-			enemy.velocityY = -2/3;
-		}
-		else if(path[Math.abs(i - path.length)] === "West"){
-			enemy.velocityX = -2/3;
-			enemy.velocityY = 0;
-		}						
-     	if (--i) {          // If i > 0, keep going
-       		theLoop(i);       // Call the loop again, and pass it the current value of i
-    	}
-   }, 1000);
- })(path.length);
-}*/
-
-function enemyMovementLogic(path, enemy){
-
-/*	for(i = 0; i < path.length; i++){
-		setTimeout(function(){console.log(path[i]);}, 1000);*/
-		
-/*		var count = frameCount;
-		var newCount = count + 1000;
-		if(frameCount < newCount){
-			if(path[i] === "North"){
-				enemy.velocityX = 0;
-				enemy.velocityY = 1;
-			}
-			else if(path[i] === "East"){
-				enemy.velocityX = 1;
-				enemy.velocityY = 0;
-			}
-			else if(path[i] === "South"){
-				enemy.velocityX = 0;
-				enemy.velocityY = -1;
-			}
-			else if(path[i] === "West"){
-				enemy.velocityX = -1;
-				enemy.velocityY = 0;
-			}						
-		}
-		else{
-			console.log("logic failed");
-		}
-	}*/
-}

@@ -1,6 +1,7 @@
-var Tower = function(x, y){ //WHEN TOWER BUTTON IS CLICKED A TOWER IS CREATED THERE!
+var Tower = function(x, y){
 	this.x = x;
 	this.y = y;
+	this.queueForProjectiles = []; //mechanism to make sure tower only hit 1 enemy at a time instead of multiple enemies
 
 	this.show = function(){
 		fill(215,8,8);	
@@ -15,5 +16,14 @@ var Tower = function(x, y){ //WHEN TOWER BUTTON IS CLICKED A TOWER IS CREATED TH
 		else{
 			return false;
 		}
+	}
+
+	this.addQueue = function(){
+		var queueStatus = "queue taken";
+		this.queueForProjectiles.push(queueStatus);
+	}
+
+	this.removeQueue = function(projectile){
+		this.queueForProjectiles.splice(0,1);
 	}
 }
